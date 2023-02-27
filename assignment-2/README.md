@@ -1,14 +1,10 @@
-Goals
-Make an assembly program that teaches all of the following:
-=how to make an array
-=how to implement iteration
-=how to make professional looking programs
-=how to reject invalid inputs
+Arrays of Integers in Assembly Language
+This repository contains an assembly language program that teaches how to make an array, implement iteration, make professional-looking programs, and reject invalid inputs. Additionally, this program allows you to add assembly programming skills to your list of qualifications in your resume.
 
-Sample run:
-
+Program Description
+This program is a hybrid program that produces the following output:
 Welcome to Arrays of Integers
-Bought to you by Jared Pope
+Bought to you by YOUR NAME HERE
 This program will manage your arrays of 64-bit floats
 For array A enter a sequence of 64-bit floats separated by white space.
 After the last input press enter followed by Control+D:
@@ -36,8 +32,14 @@ A⊕B contains
 The magnitude of A⊕B is 19.74550
 Main received 19.7455000000., and will keep it for future use.
 Main will return 0 to the operating system. Bye.
-  
---- END OF RUN ---
-  
-NOTE: The numbers for magnitude in the sample are not mathematically correct. They serve to show the relative position of
-the digits.
+
+Requirements
+To run this program, you need to have a C language compiler installed in your system. Additionally, the source code of each module must be in the language indicated in the calling diagram. You should not put any code in Main except advertising.
+
+The program uses functions taken directly from the libraries of C and C++, and it creates brand new C++ functions when needed. The assembly code outputs floats with 5 places on the right of the decimal point, while the driver outputs floats with 10 decimal places on the right of the decimal point, including trailing zeros.
+
+License
+This program is licensed under the MIT License. See the LICENSE file for details.
+
+Credits
+This program was created as part of an assignment for an assembly language course. The prompt was designed by the course professor, whose instructions were followed to create this program. If any public function was used in the program, it is documented in the source code.
