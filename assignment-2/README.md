@@ -3,13 +3,15 @@ Arrays of Integers in Assembly Language
 This repository contains an assembly language program that teaches how to make an array, implement iteration, make professional-looking programs, and reject invalid inputs. Additionally, this program allows you to add assembly programming skills to your list of qualifications in your resume.
 
 Program Description
+
 This program is a hybrid program that produces the following output:
-Welcome to Arrays of Integers
-Bought to you by YOUR NAME HERE
-This program will manage your arrays of 64-bit floats
-For array A enter a sequence of 64-bit floats separated by white space.
-After the last input press enter followed by Control+D:
-3.2
+
+Welcome to Arrays of Integers<br>
+Bought to you by YOUR NAME HERE<br>
+This program will manage your arrays of 64-bit floats<br>
+For array A enter a sequence of 64-bit floats separated by white space.<br>
+After the last input press enter followed by Control+D:<br>
+3.2<br>
 -12.25
 9.7745
 21.6
