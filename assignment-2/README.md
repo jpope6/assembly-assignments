@@ -6,7 +6,7 @@ Program Description:<br>
 This program is a hybrid program that produces the following output:
 
 Welcome to Arrays of Integers<br>
-Bought to you by YOUR NAME HERE<br>
+Bought to you by Jared Pope<br>
 This program will manage your arrays of 64-bit floats<br>
 For array A enter a sequence of 64-bit floats separated by white space.<br>
 After the last input press enter followed by Control+D:<br>
