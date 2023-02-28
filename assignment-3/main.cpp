@@ -2,7 +2,6 @@
 
 #include "stdio.h"
 #include "iostream"
-#include <cstdio>
 
 using namespace std;
 
@@ -10,7 +9,7 @@ extern "C" void executive();
 
 int main(int argc, char *argv[]) {
     printf("Welcome to Random Products, LLC\n");
-    printf("This software is mantained by Alfred Findelstein\n");
+    printf("This software is mantained by Jared Pope\n");
     executive();
     return 0;
 } // End of main

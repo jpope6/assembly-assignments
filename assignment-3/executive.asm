@@ -41,22 +41,29 @@
 ;Decleration
 extern printf
 extern scanf
+extern stdin
+extern fgets
+extern strlen
 
 global executive
 
+INPUT_LEN equ 256
 
 segment .bss
-
+string_name resb INPUT_LEN
+string_title resb INPUT_LEN
 
 segment .data
-name db "Please enter your name:", 0
-string_name db "%s", 0
-title db "Please enter your title (Mr,Ms,Sargent,Chief,Project Leader,etc):", 0
-string_title db "%s", 0
+name db "Please enter your name: ", 0
+title db "Please enter your title (Mr,Ms,Sargent,Chief,Project Leader,etc): ", 0
 greeting db "Nice to meet you %s %s", 0
+generate db "This program will generate 64-bit IEEE float numbers.", 10, 0
+numbers db "How many numbers do you want? Today’s limit is 100 per customer. ", 0
+stored db "Your numbers have been stored in an array.  Here is that array.", 10, 0
 
+stringformat db "%s", 0             ;General string format
 
-segment .txt
+segment .text
 executive:
 
 ;Prolog ===== Insurance for any caller of this assembly module ========================================================
@@ -77,23 +84,86 @@ push r14
 push r15
 push rbx
 pushf
+pushf
 
-;Print "Please enter you name: "
+push qword 0
+
+;Print "Please enter your name: "
 push qword 0                ;Push 0 onto the stack
 mov rax, 0                  ;Set the system call number to 0
 mov rdi, name               ;Set the first argument to the address of name
 call printf                 ;Call the printf function
 pop rax                     ;Pop the 0 off the stack
 
-;Print "Please enter you title: "
+;Prompt for name
+push qword 0                ;Push 0 onto the stack
+mov rax, 0                  ;Set the system call number to 0
+mov rdi, string_name        ;Set the first argument to the address of string_name
+mov rsi, INPUT_LEN          ;Set the second argument to max input length
+mov rdx, [stdin]            ;Store the input into rdx
+call fgets                  ;Call the C function to get a line of text and stop when NULL is encountered or 31 chars have been stored.
+pop rax                     ;Pop the 0 off the stack
+
+;Print "Please enter your title: "
 push qword 0                ;Push 0 onto the stack
 mov rax, 0                  ;Set the system call number to 0
 mov rdi, title              ;Set the first argument to the address of title
 call printf                 ;Call the printf function
 pop rax                     ;Pop the 0 off the stack
 
+;Prompt for title
+push qword 0                ;Push 0 onto the stack
+mov rax, 0                  ;Set the system call number to 0
+mov rdi, string_title       ;Set the first argument to the address of string_title
+mov rsi, INPUT_LEN          ;Set the second argument to max input length                 
+mov rdx, [stdin]            ;Store the input into rdx
+call fgets                  ;Call the C function to get a line of text and stop when NULL is encountered or 31 chars have been stored.
+pop rax                     ;Pop the 0 off the stack
+
+;Block to remove the \n from string_title
+push qword 0                ;Push 0 onto the stack
+mov rax, 0                  ;Set the system call number to 0
+mov rdi, string_title       ;Set the first argument to the address of string_title
+call strlen                 ;Call external function strlen, which returns the length of the string leading up to '\0'
+sub rax, 1                  ;The length is stored in rax. Here we subtract 1 from rax to obtain the location of '\n'
+mov byte [string_title + rax], 0 ;Replace the byte where '\n' exits with '\0'
+pop rax                     ;Pop the 0 off the stack
+
+;Print "Nice to meet you..."
+push qword 0                ;Push 0 onto the stack
+mov rax, 0                  ;Set the system call number to 0
+mov rdi, greeting           ;Set the first argument to the address of greeting
+mov rsi, string_title       ;Set the second argument to the address of string_title
+mov rdx, string_name        ;Set the third argument to the address of string_name
+call printf                 ;Call the printf function
+pop rax                     ;Pop the 0 off the stack
+
+;Print "The program will generate 64-bit IEEE float numbers"
+push qword 0                ;Push 0 onto the stack
+mov rax, 0                  ;Set the system call number to 0
+mov rdi, generate           ;Set the first argument to the address of generate
+call printf                 ;Call the printf function
+pop rax                     ;Pop the 0 off the stack
+
+;Print "How many numbers do you want? Todays limit is 100 per customer"
+push qword 0                ;Push 0 onto the stack
+mov rax, 0                  ;Set the system call number to 0
+mov rdi, numbers            ;Set the first argument to the address of numbers
+call printf                 ;Call the printf function
+pop rax                     ;Pop the 0 off the stack
+
+;Print "Your numbers have been stored in an array.  Here is that array."
+push qword 0                ;Push 0 onto the stack
+mov rax, 0                  ;Set the system call number to 0
+mov rdi, stored             ;Set the first argument to the address of stored
+call printf                 ;Call the printf function
+pop rax                     ;Pop the 0 off the stack
+
+
+pop rax
 
 ;===== Restore original values to integer registers ===================================================================
+popf
 popf
 pop rbx
 pop r15
