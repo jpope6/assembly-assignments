@@ -6,7 +6,7 @@ This assembly program generates up to 100 random 64-bit numbers using the non-de
 ## Goals  
 This program is designed to provide experience in the following areas:
 
-How to obtain 64-bit random numbers without a "seed"
+How to obtain 64-bit random numbers without a "seed"  
 How to input string data that may contain white space
 
 ## Requirements
