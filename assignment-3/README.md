@@ -12,6 +12,6 @@ How to input string data that may contain white space
 ## Requirements
 The program should be written in assembly language and include the following features:
 
-Generate up to 100 random 64-bit numbers without a seed
-Restrict generated numbers to the interval 1.0 <= Number < 2.0 or even intervals such as 1.0 <= number < M, where M is a predetermined fixed upper limit
+Generate up to 100 random 64-bit numbers without a seed  
+Restrict generated numbers to the interval 1.0 <= Number < 2.0 or even intervals such as 1.0 <= number < M, where M is a predetermined fixed upper limit  
 Input string data that may contain white space
