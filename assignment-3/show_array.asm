@@ -39,17 +39,21 @@
 
 
 ;Decleration
-global fill_random_array
+extern printf
+
+global show_array
 
 
 segment .bss
 
 
 segment .data
+header db "IEEE754			Scientific Decimal", 10, 0
+line db "0x%016lx	%18.13g", 10, 0
 
 
 segment .text
-fill_random_array:
+show_array:
 
 ;Prolog ===== Insurance for any caller of this assembly module ========================================================
 ;Any future program calling this module that the data in the caller's GPRs will not be modified.
@@ -72,6 +76,31 @@ pushf
 pushf
 
 push qword 0
+
+mov r15, rdi                ;Move the address of the array in r15
+mov r14, rsi                ;Save the size of the array in r14
+
+;Print out the header
+push qword 0
+mov rax, 0
+mov rdi, header
+call printf
+pop rax
+
+mov r13, 0                  ;Start the counter at 0
+beginLoop:
+    cmp r13, r14            ;Compare the counter to the size of the array
+    je endLoop              ;If counter == size, jump to end of loop 
+    push qword 0
+    mov rax, 0
+    mov rdi, line
+    mov rsi, [r15 + 8 * r13]
+    call printf
+    pop rax
+    inc r13
+    jmp beginLoop
+
+endLoop:    
 
 pop rax
 

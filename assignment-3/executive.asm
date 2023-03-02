@@ -39,6 +39,8 @@
 
 
 ;Decleration
+extern fill_random_array
+extern show_array
 extern printf
 extern scanf
 extern stdin
@@ -52,6 +54,7 @@ INPUT_LEN equ 256
 segment .bss
 string_name resb INPUT_LEN
 string_title resb INPUT_LEN
+myArray1 resq 100
 
 segment .data
 name db "Please enter your name: ", 0
@@ -62,6 +65,8 @@ numbers db "How many numbers do you want? Today’s limit is 100 per customer. "
 stored db "Your numbers have been stored in an array.  Here is that array.", 10, 0
 
 stringformat db "%s", 0             ;General string format
+floatformat db "%lf", 0
+intformat db "%d", 0
 
 segment .text
 executive:
@@ -144,6 +149,7 @@ mov rax, 0                  ;Set the system call number to 0
 mov rdi, generate           ;Set the first argument to the address of generate
 call printf                 ;Call the printf function
 pop rax                     ;Pop the 0 off the stack
+pop rax
 
 ;Print "How many numbers do you want? Todays limit is 100 per customer"
 push qword 0                ;Push 0 onto the stack
@@ -152,12 +158,38 @@ mov rdi, numbers            ;Set the first argument to the address of numbers
 call printf                 ;Call the printf function
 pop rax                     ;Pop the 0 off the stack
 
+;Block to prompt user for how many numbers they want
+push qword 0                ;Push 0 onto the stack
+mov rax, 0                  ;Set the system call number to 0
+mov rdi, intformat        ;Set the first argument to floatformat
+mov rsi, rsp                
+call scanf
+mov r15, [rsp]
+pop rax
+
 ;Print "Your numbers have been stored in an array.  Here is that array."
 push qword 0                ;Push 0 onto the stack
 mov rax, 0                  ;Set the system call number to 0
 mov rdi, stored             ;Set the first argument to the address of stored
 call printf                 ;Call the printf function
 pop rax                     ;Pop the 0 off the stack
+
+;Prepare to call fill_random_array
+push qword 0
+mov rax, 0
+mov rdi, myArray1
+mov rsi, r15
+call fill_random_array
+mov r14, rax
+pop rax
+
+;Prepare to call show_array
+push qword 0
+mov rax, 0
+mov rdi, myArray1
+mov rsi, r14
+call show_array
+pop rax
 
 
 pop rax

@@ -39,7 +39,7 @@
 
 
 ;Decleration
-global show_array
+global fill_random_array
 
 
 segment .bss
@@ -49,7 +49,7 @@ segment .data
 
 
 segment .text
-show_array:
+fill_random_array:
 
 ;Prolog ===== Insurance for any caller of this assembly module ========================================================
 ;Any future program calling this module that the data in the caller's GPRs will not be modified.
@@ -73,7 +73,25 @@ pushf
 
 push qword 0
 
+mov r15, rdi                ;Save the address of the array in r15
+mov r14, rsi                ;Save the size of the array in r14
+
+;Block to loop through array and add random values
+mov r13, 0                  ;Start the counter at 0
+beginLoop:
+    cmp r13, r14            ;Compare the counter with the size of the array
+    je exitLoop             ;If the index is equal to the size, jump to exitLoop
+
+    rdrand r12              ;Generate random qword
+    mov [r15 + 8 * r13], r12;Store the random qword into the array at the counter
+
+    inc r13                 ;Increment the counter
+    jmp beginLoop
+
+exitLoop:
+
 pop rax
+mov rax, r13                ;Return the size of the array
 
 ;===== Restore original values to integer registers ===================================================================
 popf
