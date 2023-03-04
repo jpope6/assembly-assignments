@@ -60,13 +60,13 @@ myArray1 resq 100
 segment .data
 name db "Please enter your name: ", 0
 title db "Please enter your title (Mr,Ms,Sargent,Chief,Project Leader,etc): ", 0
-greeting db "Nice to meet you %s %s", 0
+greeting db "Nice to meet you %s %s", 10, 0
 generate db "This program will generate 64-bit IEEE float numbers.", 10, 0
 numbers db "How many numbers do you want? Today’s limit is 100 per customer. ", 0
-stored db "Your numbers have been stored in an array.  Here is that array.", 10, 0
-sorted db "The array is now being sorted.", 10, 0
-updated db "Here is the updated array.", 10, 0
-goodbye db "Good bye %s. You are welcome any time.", 10, 0
+stored db "Your numbers have been stored in an array.  Here is that array.", 10, 10, 0
+sorted db 10, "The array is now being sorted.", 10, 10, 0
+updated db "Here is the updated array.", 10, 10, 0
+goodbye db 10, "Good bye %s. You are welcome any time.", 10, 10, 0
 
 stringformat db "%s", 0             ;General string format
 floatformat db "%lf", 0
