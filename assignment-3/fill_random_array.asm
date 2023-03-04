@@ -69,7 +69,6 @@ push r14
 push r15
 push rbx
 pushf
-pushf
 
 push qword 0
 
@@ -94,7 +93,6 @@ pop rax
 mov rax, r13                ;Return the size of the array
 
 ;===== Restore original values to integer registers ===================================================================
-popf
 popf
 pop rbx
 pop r15

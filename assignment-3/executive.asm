@@ -41,6 +41,7 @@
 ;Decleration
 extern fill_random_array
 extern show_array
+extern quick_sort
 extern printf
 extern scanf
 extern stdin
@@ -63,6 +64,9 @@ greeting db "Nice to meet you %s %s", 0
 generate db "This program will generate 64-bit IEEE float numbers.", 10, 0
 numbers db "How many numbers do you want? Today’s limit is 100 per customer. ", 0
 stored db "Your numbers have been stored in an array.  Here is that array.", 10, 0
+sorted db "The array is now being sorted.", 10, 0
+updated db "Here is the updated array.", 10, 0
+goodbye db "Good bye %s. You are welcome any time.", 10, 0
 
 stringformat db "%s", 0             ;General string format
 floatformat db "%lf", 0
@@ -88,7 +92,6 @@ push r13
 push r14
 push r15
 push rbx
-pushf
 pushf
 
 push qword 0
@@ -149,7 +152,6 @@ mov rax, 0                  ;Set the system call number to 0
 mov rdi, generate           ;Set the first argument to the address of generate
 call printf                 ;Call the printf function
 pop rax                     ;Pop the 0 off the stack
-pop rax
 
 ;Print "How many numbers do you want? Todays limit is 100 per customer"
 push qword 0                ;Push 0 onto the stack
@@ -191,11 +193,59 @@ mov rsi, r14
 call show_array
 pop rax
 
-
+;Print "The array is now being sorted."
+push qword 0
+mov rax, 0
+mov rdi, sorted
+call printf
 pop rax
 
+;Print "Here is the updated array."
+push qword 0
+mov rax, 0
+mov rdi, updated
+call printf
+pop rax
+
+;Prepare to call quick_sort
+push qword 0
+mov rax, 0
+mov rdi, myArray1
+mov rsi, r14
+call quick_sort
+mov r13, rax
+pop rax
+
+;Prepare to call show_array
+push qword 0
+mov rax, 0
+mov rdi, r13
+mov rsi, r14
+call show_array
+pop rax
+
+;Print "Good bye <name>.  You are welcome any time."
+push qword 0
+mov rax, 0
+mov rdi, goodbye
+mov rsi, string_title
+call printf
+pop rax
+
+;Block to remove the \n from string_name
+push qword 0                ;Push 0 onto the stack
+mov rax, 0                  ;Set the system call number to 0
+mov rdi, string_name       ;Set the first argument to the address of string_title
+call strlen                 ;Call external function strlen, which returns the length of the string leading up to '\0'
+sub rax, 1                  ;The length is stored in rax. Here we subtract 1 from rax to obtain the location of '\n'
+mov byte [string_name + rax], 0 ;Replace the byte where '\n' exits with '\0'
+pop rax                     ;Pop the 0 off the stack
+
+
+pop rax
+mov rax, string_name
+
 ;===== Restore original values to integer registers ===================================================================
-popf
 popf
 pop rbx
 pop r15

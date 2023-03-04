@@ -49,8 +49,9 @@ segment .bss
 
 segment .data
 header db "IEEE754			Scientific Decimal", 10, 0
-line db "0x%016lx	%18.13g", 10, 0
+line db "0x%016lx %-18.13e", 10, 0
 
+intform db "%d", 10, 0
 
 segment .text
 show_array:
@@ -73,7 +74,6 @@ push r14
 push r15
 push rbx
 pushf
-pushf
 
 push qword 0
 
@@ -89,14 +89,17 @@ pop rax
 
 mov r13, 0                  ;Start the counter at 0
 beginLoop:
-    cmp r13, r14            ;Compare the counter to the size of the array
-    je endLoop              ;If counter == size, jump to end of loop 
+    cmp r13, r14
+    je endLoop
+
     push qword 0
-    mov rax, 0
+    mov rax, 1
     mov rdi, line
-    mov rsi, [r15 + 8 * r13]
+    mov rsi, [r15 + 4 * r13]
+    cvtsi2sd xmm0, [r15 + 4 * r13]
     call printf
     pop rax
+
     inc r13
     jmp beginLoop
 
@@ -105,7 +108,6 @@ endLoop:
 pop rax
 
 ;===== Restore original values to integer registers ===================================================================
-popf
 popf
 pop rbx
 pop r15
