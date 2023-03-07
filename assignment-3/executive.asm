@@ -66,6 +66,7 @@ numbers db "How many numbers do you want? Today’s limit is 100 per customer. "
 stored db "Your numbers have been stored in an array.  Here is that array.", 10, 10, 0
 sorted db 10, "The array is now being sorted.", 10, 10, 0
 updated db "Here is the updated array.", 10, 10, 0
+normalized db 10, "The random numbers will be normalized. Here is the normalized array", 10, 10, 0
 goodbye db 10, "Good bye %s. You are welcome any time.", 10, 10, 0
 
 stringformat db "%s", 0             ;General string format
@@ -223,6 +224,14 @@ mov rdi, r13
 mov rsi, r14
 call show_array
 pop rax
+
+;Print "The random numbers will be normalized. Here is the normalized array"
+push qword 0
+mov rax, 0
+mov rdi, normalized
+call printf
+pop rax
+
 
 ;Print "Good bye <name>.  You are welcome any time."
 push qword 0

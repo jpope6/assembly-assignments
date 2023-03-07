@@ -95,7 +95,7 @@ beginLoop:
     push qword 0
     mov rax, 1
     mov rdi, line
-    mov rsi, [r15 + 4 * r13]
+    mov rsi, qword [r15 + 4 * r13]
     cvtsi2sd xmm0, [r15 + 4 * r13]
     call printf
     pop rax

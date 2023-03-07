@@ -77,11 +77,21 @@ mov r14, rsi                ;Save the size of the array in r14
 
 ;Block to loop through array and add random values
 mov r13, 0                  ;Start the counter at 0
+
 beginLoop:
+
     cmp r13, r14            ;Compare the counter with the size of the array
     je exitLoop             ;If the index is equal to the size, jump to exitLoop
 
     rdrand r12              ;Generate random qword
+
+    mov rbx, r12            ;Save the address of the random qword in rbx
+    shr rbx, 52             ;Shift r12 to the right by 52 (size of mantissa)
+    cmp rbx, 0x7FF          ;Check if positive NaN
+    je beginLoop            ;If it is NaN, jump to the beginning of loop to get a new number
+    cmp rbx, 0xFFF          ;Check if negative NaN
+    je beginLoop            ;If it is NaN, jump to the beginning of loop to get a new number
+
     mov [r15 + 8 * r13], r12;Store the random qword into the array at the counter
 
     inc r13                 ;Increment the counter
