@@ -232,6 +232,36 @@ mov rdi, normalized
 call printf
 pop rax
 
+;Block to normalize the array
+push qword 0
+mov rax, 0
+
+mov r12, 0
+beginLoop:
+    cmp r12, r14
+    je endLoop
+
+    mov rbx, [r13 + 8 * r12]
+    shl rbx, 12
+    shr rbx, 12
+    mov r8, 1023
+    shl r8, 52
+    or rbx, r8
+    mov [r13 + 8 * r12], rbx
+    inc r12
+
+    jmp beginLoop
+
+endLoop:
+pop rax
+
+;Prepare to call show_array
+push qword 0
+mov rax, 0
+mov rdi, r13
+mov rsi, r14
+call show_array
+pop rax
 
 ;Print "Good bye <name>.  You are welcome any time."
 push qword 0
