@@ -92,7 +92,7 @@ beginLoop:
     cmp rbx, 0xFFF          ;Check if negative NaN
     je beginLoop            ;If it is NaN, jump to the beginning of loop to get a new number
 
-    mov [r15 + 8 * r13], r12;Store the random qword into the array at the counter
+    mov qword [r15 + 8 * r13], r12;Store the random qword into the array at the counter
 
     inc r13                 ;Increment the counter
     jmp beginLoop

@@ -51,7 +51,8 @@ segment .data
 header db "IEEE754			Scientific Decimal", 10, 0
 line db "0x%016lx %-18.13e", 10, 0
 
-intform db "%d", 10, 0
+scienceform db "%18.13e, ", 10, 0
+intform db "%d, ", 10, 0
 
 segment .text
 show_array:
@@ -95,8 +96,10 @@ beginLoop:
     push qword 0
     mov rax, 1
     mov rdi, line
-    mov rsi, qword [r15 + 4 * r13]
-    cvtsi2sd xmm0, [r15 + 4 * r13]
+    mov rsi, qword [r15 + 8 * r13]
+    movsd xmm0, [r15 + 8 * r13]
+    ;mov rdi, intform
+    ;mov rsi, [r15 + 8 * r13]
     call printf
     pop rax
 

@@ -244,10 +244,11 @@ beginLoop:
     mov rbx, [r13 + 8 * r12]
     shl rbx, 12
     shr rbx, 12
-    mov r8, 1023
+    mov r8, 0x3FF
     shl r8, 52
     or rbx, r8
     mov [r13 + 8 * r12], rbx
+
     inc r12
 
     jmp beginLoop
@@ -255,10 +256,19 @@ beginLoop:
 endLoop:
 pop rax
 
-;Prepare to call show_array
+;Prepare to call quick_sort
 push qword 0
 mov rax, 0
 mov rdi, r13
+mov rsi, r14
+call quick_sort
+mov r10, rax
+pop rax
+
+;Prepare to call show_array
+push qword 0
+mov rax, 0
+mov rdi, r10
 mov rsi, r14
 call show_array
 pop rax
