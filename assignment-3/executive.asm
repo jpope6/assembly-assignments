@@ -41,12 +41,15 @@
 ;Decleration
 extern fill_random_array
 extern show_array
-extern quick_sort
+;extern quick_sort
 extern printf
 extern scanf
 extern stdin
 extern fgets
 extern strlen
+
+extern compar
+extern qsort
 
 global executive
 
@@ -67,6 +70,7 @@ stored db "Your numbers have been stored in an array.  Here is that array.", 10,
 sorted db 10, "The array is now being sorted.", 10, 10, 0
 updated db "Here is the updated array.", 10, 10, 0
 normalized db 10, "The random numbers will be normalized. Here is the normalized array", 10, 10, 0
+sortnormalized db 10, "The normalized array is now being sorted", 10, 10, 0
 goodbye db 10, "Good bye %s. You are welcome any time.", 10, 10, 0
 
 stringformat db "%s", 0             ;General string format
@@ -164,11 +168,11 @@ pop rax                     ;Pop the 0 off the stack
 ;Block to prompt user for how many numbers they want
 push qword 0                ;Push 0 onto the stack
 mov rax, 0                  ;Set the system call number to 0
-mov rdi, intformat        ;Set the first argument to floatformat
-mov rsi, rsp                
-call scanf
-mov r15, [rsp]
-pop rax
+mov rdi, intformat          ;Set the first argument to intformat
+mov rsi, rsp                ;Set the second argument to rsp
+call scanf                  ;Call the scanf function
+mov r15, [rsp]              ;Store the input in r15
+pop rax                     ;Pop the 0 off the stack
 
 ;Print "Your numbers have been stored in an array.  Here is that array."
 push qword 0                ;Push 0 onto the stack
@@ -178,108 +182,132 @@ call printf                 ;Call the printf function
 pop rax                     ;Pop the 0 off the stack
 
 ;Prepare to call fill_random_array
-push qword 0
-mov rax, 0
-mov rdi, myArray1
-mov rsi, r15
-call fill_random_array
-mov r14, rax
-pop rax
+push qword 0                ;Push 0 onto the stack
+mov rax, 0                  ;Set the system call number to 0
+mov rdi, myArray1           ;Set the first argument to the address of myArray1
+mov rsi, r15                ;Set the second argument to the amount the user input
+call fill_random_array      ;Call the fill_random_array function
+mov r14, rax                ;Return the size of the array to r14
+pop rax                     ;Pop the 0 off the stack
 
 ;Prepare to call show_array
-push qword 0
-mov rax, 0
-mov rdi, myArray1
-mov rsi, r14
-call show_array
-pop rax
+push qword 0                ;Push 0 onto the stack
+mov rax, 0                  ;Set the system call number to 0
+mov rdi, myArray1           ;Set the first argument to the address of myArray1
+mov rsi, r14                ;Set the second argument to the size of the array
+call show_array             ;Call the show_array function
+pop rax                     ;Pop the 0 off the stack
 
 ;Print "The array is now being sorted."
-push qword 0
-mov rax, 0
-mov rdi, sorted
-call printf
-pop rax
+push qword 0                ;Push 0 onto the stack
+mov rax, 0                  ;Set the system call number to 0
+mov rdi, sorted             ;Set the first argument to the address of sorted
+call printf                 ;Call the printf function
+pop rax                     ;Pop the 0 off the stack
 
 ;Print "Here is the updated array."
-push qword 0
-mov rax, 0
-mov rdi, updated
-call printf
-pop rax
+push qword 0                ;Push 0 onto the stack
+mov rax, 0                  ;Set the system call number to 0
+mov rdi, updated            ;Set the first argument to the address of updated
+call printf                 ;Call the printf function
+pop rax                     ;Pop the 0 off the stack
 
-;Prepare to call quick_sort
-push qword 0
-mov rax, 0
-mov rdi, myArray1
-mov rsi, r14
-call quick_sort
-mov r13, rax
-pop rax
+;Prepare to call qsort
+push qword 0                ;Push 0 onto the stack
+mov rax, 0                  ;Set the system call number to 0
+mov rdi, myArray1           ;Set the first argument to the address of myArray1
+mov rsi, r14                ;Set the second argument to the size of the array
+mov rdx, 8                  ;Set the third argument to the size in bytes of element in array
+mov rcx, compar             ;Set the fourth argument to our compar function
+call qsort                  ;Call the qsort function
+pop rax                     ;Pop the 0 off the stack
 
 ;Prepare to call show_array
-push qword 0
-mov rax, 0
-mov rdi, r13
-mov rsi, r14
-call show_array
-pop rax
+push qword 0                ;Push 0 onto the stack
+mov rax, 0                  ;Set the system call number to 0
+mov rdi, myArray1           ;Set the first argument to the address of myArray1
+mov rsi, r14                ;Set the second argument to the size of the array
+call show_array             ;Call the show_array function
+pop rax                     ;Pop the 0 off the stack
 
 ;Print "The random numbers will be normalized. Here is the normalized array"
-push qword 0
-mov rax, 0
-mov rdi, normalized
-call printf
-pop rax
+push qword 0                ;Push 0 onto the stack
+mov rax, 0                  ;Set the system call number to 0
+mov rdi, normalized         ;Set the first argument to the address of normalized
+call printf                 ;Call the printf function
+pop rax                     ;Pop the 0 off the stack
 
 ;Block to normalize the array
-push qword 0
-mov rax, 0
+push qword 0                ;Push 0 onto the stack
+mov rax, 0                  ;Set the system call number to 0
 
-mov r12, 0
+mov r12, 0                  ;Set the counter to 0
 beginLoop:
-    cmp r12, r14
-    je endLoop
+    cmp r12, r14            ;Compare the counter with the size of the array
+    je endLoop              ;If counter == size, jump out of the loop
 
-    mov rbx, [r13 + 8 * r12]
-    shl rbx, 12
-    shr rbx, 12
-    mov r8, 0x3FF
-    shl r8, 52
-    or rbx, r8
-    mov [r13 + 8 * r12], rbx
+    mov rbx, [myArray1 + 8 * r12];Store myArray1[i] in rbx
+    shl rbx, 12             ;Shift rbx to the left 12 units
+    shr rbx, 12             ;Shift rbx to the right 12 units
+    mov r8, 0x3FF           ;Store 0x3FF in r8
+    shl r8, 52              ;Shift r8 to the left 52 units
+    or rbx, r8              ;Combine rbx and r8, the exponent will now be 0
+    mov [myArray1 + 8 * r12], rbx;Store the new value into myArray1[i]
 
-    inc r12
+    inc r12                 ;i++
 
     jmp beginLoop
 
 endLoop:
-pop rax
-
-;Prepare to call quick_sort
-push qword 0
-mov rax, 0
-mov rdi, r13
-mov rsi, r14
-call quick_sort
-mov r10, rax
-pop rax
+pop rax                     ;Pop the 0 off the stack
 
 ;Prepare to call show_array
-push qword 0
-mov rax, 0
-mov rdi, r10
-mov rsi, r14
-call show_array
-pop rax
+push qword 0                ;Push 0 onto the stack
+mov rax, 0                  ;Set the system call number to 0
+mov rdi, myArray1           ;Set the first argument to the address of myArray1
+mov rsi, r14                ;Set the second argument to the size of the array
+call show_array             ;Call the show_array function
+pop rax                     ;Pop the 0 off the stack
 
-;Print "Good bye <name>.  You are welcome any time."
+;Print "The normalized array will now be sorted"
 push qword 0
 mov rax, 0
-mov rdi, goodbye
-mov rsi, string_title
+mov rdi, sortnormalized
 call printf
 pop rax
+
+;Print "Here is the updated array."
+push qword 0                ;Push 0 onto the stack
+mov rax, 0                  ;Set the system call number to 0
+mov rdi, updated            ;Set the first argument to the address of updated
+call printf                 ;Call the printf function
+pop rax                     ;Pop the 0 off the stack
+
+;Prepare to call qsort
+push qword 0                ;Push 0 onto the stack
+mov rax, 0                  ;Set the system call number to 0
+mov rdi, myArray1           ;Set the first argument to the address of myArray1
+mov rsi, r14                ;Set the second argument to the size of the array
+mov rdx, 8                  ;Set the third argument to the size in bytes of element in array
+mov rcx, compar             ;Set the fourth argument to our compar function
+call qsort                  ;Call the qsort function
+pop rax                     ;Pop the 0 off the stack
+
+;Prepare to call show_array
+push qword 0                ;Push 0 onto the stack
+mov rax, 0                  ;Set the system call number to 0
+mov rdi, myArray1           ;Set the first argument to the address of myArray1
+mov rsi, r14                ;Set the second argument to the size of the array
+call show_array             ;Call the show_array function
+pop rax                     ;Pop the 0 off the stack
+
+;Print "Good bye <name>.  You are welcome any time."
+push qword 0                ;Push 0 onto the stack
+mov rax, 0                  ;Set the system call number to 0
+mov rdi, goodbye            ;Set the first argument to the address of goodbye
+mov rsi, string_title       ;Set the second argument to the address of string_title
+call printf                 ;Call the printf function
+pop rax                     ;Pop the 0 off the stack
 
 ;Block to remove the \n from string_name
 push qword 0                ;Push 0 onto the stack
@@ -292,7 +320,7 @@ pop rax                     ;Pop the 0 off the stack
 
 
 pop rax
-mov rax, string_name
+mov rax, string_name        ;Return the users name to the main function
 
 ;===== Restore original values to integer registers ===================================================================
 popf

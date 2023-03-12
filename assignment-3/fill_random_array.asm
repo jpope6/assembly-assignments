@@ -92,7 +92,7 @@ beginLoop:
     cmp rbx, 0xFFF          ;Check if negative NaN
     je beginLoop            ;If it is NaN, jump to the beginning of loop to get a new number
 
-    mov qword [r15 + 8 * r13], r12;Store the random qword into the array at the counter
+    mov [r15 + 8 * r13], r12;Store the random qword into the array at the counter
 
     inc r13                 ;Increment the counter
     jmp beginLoop
@@ -100,7 +100,7 @@ beginLoop:
 exitLoop:
 
 pop rax
-mov rax, r13                ;Return the size of the array
+mov rax, r14
 
 ;===== Restore original values to integer registers ===================================================================
 popf

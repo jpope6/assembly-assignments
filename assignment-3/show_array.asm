@@ -51,9 +51,6 @@ segment .data
 header db "IEEE754			Scientific Decimal", 10, 0
 line db "0x%016lx %-18.13e", 10, 0
 
-scienceform db "%18.13e, ", 10, 0
-intform db "%d, ", 10, 0
-
 segment .text
 show_array:
 
@@ -82,33 +79,31 @@ mov r15, rdi                ;Move the address of the array in r15
 mov r14, rsi                ;Save the size of the array in r14
 
 ;Print out the header
-push qword 0
-mov rax, 0
-mov rdi, header
-call printf
-pop rax
+push qword 0                ;Push 0 onto the stack
+mov rax, 0                  ;Set the system call number to 0
+mov rdi, header             ;Set the first argument to the address of header 
+call printf                 ;Call the printf function
+pop rax                     ;Pop the 0 off the stack
 
 mov r13, 0                  ;Start the counter at 0
 beginLoop:
-    cmp r13, r14
-    je endLoop
+    cmp r13, r14            ;Compare the counter to the size of the array
+    je endLoop              ;If the size == counter, break out of the loop 
 
-    push qword 0
-    mov rax, 1
-    mov rdi, line
-    mov rsi, qword [r15 + 8 * r13]
-    movsd xmm0, [r15 + 8 * r13]
-    ;mov rdi, intform
-    ;mov rsi, [r15 + 8 * r13]
-    call printf
-    pop rax
+    push qword 0            ;Push 0 onto the stack
+    mov rax, 1              ;Set the system call number to 1
+    mov rdi, line           ;Set the first argument to the address of line
+    mov rsi, [r15 + 8 * r13];Store array[i] in rsi
+    movsd xmm0, [r15 + 8 * r13];Store array[i] in xmm0
+    call printf             ;Call the printf function
+    pop rax                 ;Pop the 0 off the stack
 
-    inc r13
-    jmp beginLoop
+    inc r13                 ;Increment the counter
+    jmp beginLoop       
 
 endLoop:    
 
-pop rax
+pop rax                     ;Pop the 0 off the stack
 
 ;===== Restore original values to integer registers ===================================================================
 popf
