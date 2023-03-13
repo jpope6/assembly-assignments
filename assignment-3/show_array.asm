@@ -21,10 +21,10 @@
 ;
 ;Program information
 ;  Program name: Non-deterministic Random Numbers
-;  Programming languages: Assembly, C++, bash
+;  Programming languages: Assembly, C++, C, bash
 ;  Date program began: 2023 February 27
-;  Date of last update: 2023 February 21
-;  Date of reorganization of comments: 2023 February 21
+;  Date of last update: 2023 March 13
+;  Date of reorganization of comments: 2023 March 13
 ;  Files in this program: main.cpp executive.asm fill_random_array.asm quick_sort.cpp show_array.asm
 ;  Status: Finished.  The program was tested extensively with no errors in Tuffix 2020 Edition.
 ;
@@ -33,8 +33,9 @@
 ;   Language: X86 with Intel syntax.
 ;   Max page width: 132 columns
 ;   Assemble: nasm -f elf64 -l show_array.lis -o show_array.o show_array.asm
-;   Link: g++ -m64 -std=c++17 -o a.out -fno-pie -no-pie manager.o magnitude.o input_array.o append.o display_array.o main.o
-;   Purpose: 
+;   Link: g++ -m64 -fno-pie -no-pie -o a.out compar.o show_array.o fill_random_array.o executive.o main.o -fno-pie -no-pie
+;   Purpose: This module will take an array and the size of the array as parameters. This module will then loop through the 
+;               array and print out the element in the array in both IEEE form and Scientific notation. 
 ;=============================================================================================================================
 
 

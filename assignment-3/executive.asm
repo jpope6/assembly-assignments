@@ -21,11 +21,11 @@
 ;
 ;Program information
 ;  Program name: Non-deterministic Random Numbers
-;  Programming languages: Assembly, C++, bash
+;  Programming languages: Assembly, C++, C, bash
 ;  Date program began: 2023 February 27
-;  Date of last update: 2023 February 21
-;  Date of reorganization of comments: 2023 February 21
-;  Files in this program: main.cpp executive.asm fill_random_array.asm quick_sort.cpp show_array.asm
+;  Date of last update: 2023 March 13
+;  Date of reorganization of comments: 2023 March 13
+;  Files in this program: main.cpp executive.asm fill_random_array.asm quick_sort.cpp show_array.asm, r.sh
 ;  Status: Finished.  The program was tested extensively with no errors in Tuffix 2020 Edition.
 ;
 ;This file
@@ -33,15 +33,16 @@
 ;   Language: X86 with Intel syntax.
 ;   Max page width: 132 columns
 ;   Assemble: nasm -f elf64 -l executive.lis -o executive.o executive.asm
-;   Link: g++ -m64 -std=c++17 -o a.out -fno-pie -no-pie manager.o magnitude.o input_array.o append.o display_array.o main.o
-;   Purpose: 
+;   Link: g++ -m64 -fno-pie -no-pie -o a.out compar.o show_array.o fill_random_array.o executive.o main.o -fno-pie -no-pie
+;   Purpose: This is the central module that will direct calls to different functions including fill_random_array,
+;               show_array, and qsort. This module will also ask for the input of the user's name and title and will
+;               return the name to the main function
 ;=============================================================================================================================
 
 
 ;Decleration
 extern fill_random_array
 extern show_array
-;extern quick_sort
 extern printf
 extern scanf
 extern stdin
@@ -270,11 +271,11 @@ call show_array             ;Call the show_array function
 pop rax                     ;Pop the 0 off the stack
 
 ;Print "The normalized array will now be sorted"
-push qword 0
-mov rax, 0
-mov rdi, sortnormalized
-call printf
-pop rax
+push qword 0                ;Push 0 onto the stack
+mov rax, 0                  ;Set the system call number to 0
+mov rdi, sortnormalized     ;Set the first argument to the address of sortnormalized
+call printf                 ;Call the printf function
+pop rax                     ;Pop the 0 off the stack
 
 ;Print "Here is the updated array."
 push qword 0                ;Push 0 onto the stack

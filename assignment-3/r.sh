@@ -4,6 +4,7 @@
 # Author: Jared Pope
 
 # Purpose: script file to run program files together
+
 # Clear any previously compiled outputs
 rm *.o
 rm *.out 
@@ -17,9 +18,6 @@ nasm -f elf64 -l fill_random_array.lis -o fill_random_array.o fill_random_array.
 
 echo "Assemble show_array.asm"
 nasm -f elf64 -l show_array.lis -o show_array.o show_array.asm
-
-# echo "Compile quick_sort.cpp using gcc compiler standard 2017"
-# g++ -c -m64 -Wall -l quick_sort.lis -o quick_sort.o quick_sort.cpp -fno-pie -no-pie -std=c++17
 
 echo "compile compar.c using gcc compiler standard 2011"
 gcc -c -Wall -m64 -no-pie -o compar.o compar.c -std=c11
