@@ -29,7 +29,7 @@
 ;  Status: Finished.  The program was tested extensively with no errors in Tuffix 2020 Edition.
 ;
 ;This file
-;   File name: show_array.asm
+;   File name: fill_random_array.asm
 ;   Language: X86 with Intel syntax.
 ;   Max page width: 132 columns
 ;   Assemble: nasm -f elf64 -l fill_random_array.lis -o fill_random_array.o fill_random_array.asm
