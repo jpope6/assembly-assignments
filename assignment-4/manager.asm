@@ -44,25 +44,31 @@
 extern printf
 extern scanf
 extern getradicand
+extern cpuid
 
 
 global manager
 
 
 segment .bss
+cpu_name resb 100
 
 segment .data
 welcome db "Welcome to Square Root Benchmarks by Jared Pope", 10, 10, 0
 contact db "For customer service contact me at imthepope@csu.fullerton.edu", 10, 10, 0
-cpu_type db "Your CPU is AMD Ryzen 3640.", 10, 10, 0
-max_clock_speed db "Your max clock speed is 2800 MHz", 10, 10, 0
-square_root db "The square root of 12.1999999995 is 3.78457514234.", 10, 10, 0
+cpu_type db "Your CPU is %s", 10, 10, 0
+max_clock_speed db "Your max clock speed is %d MHz", 10, 10, 0
+enter_num db "Please enter a floating radicand for square root bench marking: ", 0
+square_root db 10, "The square root of %lf is %lf", 10, 10, 0
 iterations db "Next enter the number of times iteration should be performed: ", 0
 time db "The time on the clock is 2451294 tics.", 10, 10, 0
 in_progress db "The bench mark of the sqrtsd instruction is in progress.", 10, 10, 0
 complete db "The time on the clock is 2451399 tics and the benchmark is completed.", 10, 10, 0
 elapsed_time db "The elapsed time was 238884 tics", 10, 10, 0
 time_for_one_sqrt db "The time for one square root computation is 27.36841 tics which equals 9.28441 ns.", 10, 10, 0
+
+float_form db "%lf", 0
+int_form db "%d", 0
 
 
 segment .text
@@ -103,6 +109,101 @@ mov rdi, contact            ;Set the first argument to the address of contact
 call printf                 ;Call the printf function
 pop rax                     ;Pop the 0 off the stack
 
+;Block to get the name of the CPU
+mov r15, 0x80000002
+mov rax, r15
+cpuid
+
+mov [cpu_name], rax
+mov [cpu_name + 4], rbx
+mov [cpu_name + 8], rcx
+mov [cpu_name + 12], rdx
+
+mov r15, 0x80000003
+mov rax, r15
+cpuid
+
+mov [cpu_name + 16], rax
+mov [cpu_name + 20], rbx
+mov [cpu_name + 24], rcx
+mov [cpu_name + 28], rdx
+
+mov r15, 0x80000004
+mov rax, r15
+cpuid
+
+mov [cpu_name + 32], rax
+mov [cpu_name + 36], rbx
+mov [cpu_name + 40], rcx
+mov [cpu_name + 44], rdx
+
+push qword 0
+mov rax, 0
+mov rdi, cpu_type
+mov rsi, cpu_name
+call printf
+pop rax
+
+;Block to get max clock speed
+mov rax,0x0000000000000016
+cpuid
+mov rdx, rbx
+
+push qword 0
+mov rax, 0
+mov rdi, max_clock_speed
+mov rsi, rdx
+call printf
+pop rax
+
+;Block to output "Please enter a floating radicand for square root bench marking:"
+push qword 0
+mov rax, 0
+mov rdi, enter_num
+call printf
+pop rax
+
+;Block to read in radicand
+push qword 0
+mov rax, 0
+mov rdi, float_form
+mov rsi, rsp
+call scanf
+movsd xmm12, [rsp]
+pop rax
+
+;Take the square root of the input number
+push qword 0
+mov rax, 0
+movsd xmm0, xmm12
+sqrtsd xmm0, xmm0
+movsd xmm11, xmm0
+pop rax
+
+;Print "The square root of ... is ..."
+push qword 0
+mov rax, 2
+mov rdi, square_root
+movsd xmm0, xmm12
+movsd xmm1, xmm11
+call printf
+pop rax
+
+;Block to output "Next enter the number of times iteration should be performed:"
+push qword 0
+mov rax, 0
+mov rdi, iterations
+call printf
+pop rax
+
+;Block to read in radicand
+push qword 0
+mov rax, 0
+mov rdi, int_form
+mov rsi, rsp
+call scanf
+mov r15, [rsp]
+pop rax
 
 pop rax
 
