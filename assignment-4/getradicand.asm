@@ -51,7 +51,9 @@ global getradicand
 segment .bss
 
 segment .data
-enter_num db "hello", 10, 0
+enter_num db "Please enter a floating radicand for square root bench marking: ", 0
+
+float_form db "%lf", 0
 
 
 segment .text
@@ -85,7 +87,19 @@ mov rdi, enter_num          ;Set the first argument to the address of enter
 call printf                 ;Call the printf function
 pop rax                     ;Pop the 0 off the stack
 
+;Block to read in radicand
+push qword 0                ;Push 0 onto the stack
+mov rax, 0                  ;Set the system call number to 0
+mov rdi, float_form         ;Set the first argument to the address of float_form
+mov rsi, rsp                ;Set the second argument to the address of the rsp
+call scanf                  ;Call the scanf function
+movsd xmm12, [rsp]          ;Store the input into xmm12
+pop rax                     ;Pop the 0 off the stack
+
+
 pop rax
+movsd xmm0, xmm12           ;Return the input number
+
 
 ;===== Restore original values to integer registers ===================================================================
 popf
