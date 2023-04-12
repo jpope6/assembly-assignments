@@ -61,9 +61,9 @@ cpu_type db "Your CPU is %s", 10, 10, 0
 max_clock_speed db "Your max clock speed is %d GHz", 10, 10, 0
 square_root db 10, "The square root of %lf is %lf", 10, 10, 0
 iterations db "Next enter the number of times iteration should be performed: ", 0
-time db 10, "The time on the clock is %d tics.", 10, 10, 0
+time db 10, "The time on the clock is %llu tics.", 10, 10, 0
 in_progress db "The bench mark of the sqrtsd instruction is in progress.", 10, 10, 0
-complete db "The time on the clock is %d tics and the benchmark is completed.", 10, 10, 0
+complete db "The time on the clock is %llu tics and the benchmark is completed.", 10, 10, 0
 elapsed_time db "The elapsed time was %d tics", 10, 10, 0
 time_for_one_sqrt db "The time for one square root computation is 27.36841 tics which equals 9.28441 ns.", 10, 10, 0
 
@@ -203,7 +203,7 @@ xor rax, rax
 xor rdx, rdx
 cpuid
 rdtsc
-shl rax, 32
+shl rdx, 32
 add rdx, rax
 mov r14, rdx
 pop rax
@@ -244,7 +244,7 @@ xor rax, rax
 xor rdx, rdx
 cpuid
 rdtsc
-shl rax, 32
+shl rdx, 32
 add rdx, rax
 mov r13, rdx
 pop rax
