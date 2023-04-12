@@ -46,6 +46,7 @@ extern scanf
 extern getradicand
 extern cpuid
 extern rdtsc
+extern getfreq
 
 
 global manager
@@ -58,14 +59,14 @@ segment .data
 welcome db "Welcome to Square Root Benchmarks by Jared Pope", 10, 10, 0
 contact db "For customer service contact me at imthepope@csu.fullerton.edu", 10, 10, 0
 cpu_type db "Your CPU is %s", 10, 10, 0
-max_clock_speed db "Your max clock speed is %d GHz", 10, 10, 0
+max_clock_speed db "Your max clock speed is %lf GHz", 10, 10, 0
 square_root db 10, "The square root of %lf is %lf", 10, 10, 0
 iterations db "Next enter the number of times iteration should be performed: ", 0
 time db 10, "The time on the clock is %llu tics.", 10, 10, 0
 in_progress db "The bench mark of the sqrtsd instruction is in progress.", 10, 10, 0
 complete db "The time on the clock is %llu tics and the benchmark is completed.", 10, 10, 0
 elapsed_time db "The elapsed time was %d tics", 10, 10, 0
-time_for_one_sqrt db "The time for one square root computation is 27.36841 tics which equals 9.28441 ns.", 10, 10, 0
+time_for_one_sqrt db "The time for one square root computation is %lf tics which equals %lf ns.", 10, 10, 0
 
 float_form db "%lf", 0
 int_form db "%d", 0
@@ -118,7 +119,6 @@ mov [cpu_name], rax
 mov [cpu_name + 4], rbx
 mov [cpu_name + 8], rcx
 mov [cpu_name + 12], rdx
-
 mov r15, 0x80000003
 mov rax, r15
 cpuid
@@ -146,14 +146,20 @@ call printf
 pop rax
 
 ;Block to get max clock speed
-mov rax, 0x0000000000000016
-cpuid
-mov rdx, rbx
+;mov rax, 0x0000000000000016
+;cpuid
+;mov rdx, rbx
 
 push qword 0
 mov rax, 0
+call getfreq
+movsd xmm13, xmm0
+pop rax
+
+push qword 0
+mov rax, 1
 mov rdi, max_clock_speed
-mov rsi, rdx
+movsd xmm0, xmm13
 call printf
 pop rax
 
