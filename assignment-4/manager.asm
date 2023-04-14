@@ -59,14 +59,15 @@ segment .data
 welcome db "Welcome to Square Root Benchmarks by Jared Pope", 10, 10, 0
 contact db "For customer service contact me at imthepope@csu.fullerton.edu", 10, 10, 0
 cpu_type db "Your CPU is %s", 10, 10, 0
-max_clock_speed db "Your max clock speed is %lf GHz", 10, 10, 0
+amd_cpu db "I cannot read the max clock speed of AMD CPUs. Please enter your CPUs max clock speed: ", 0
+max_clock_speed db 10, "Your max clock speed is %.3f GHz", 10, 10, 0
 square_root db 10, "The square root of %lf is %lf", 10, 10, 0
 iterations db "Next enter the number of times iteration should be performed: ", 0
 time db 10, "The time on the clock is %llu tics.", 10, 10, 0
 in_progress db "The bench mark of the sqrtsd instruction is in progress.", 10, 10, 0
 complete db "The time on the clock is %llu tics and the benchmark is completed.", 10, 10, 0
 elapsed_time db "The elapsed time was %d tics", 10, 10, 0
-time_for_one_sqrt db "The time for one square root computation is %lf tics which equals %lf ns.", 10, 10, 0
+time_for_one_sqrt db "The time for one square root computation is %lf tics which equals 0.00000 ns.", 10, 10, 0
 
 float_form db "%lf", 0
 int_form db "%d", 0
@@ -150,11 +151,54 @@ pop rax
 ;cpuid
 ;mov rdx, rbx
 
+;Load the first character of the string into the AL register
+mov al, byte [cpu_name]
+
+;Compare the first character with 'A'
+cmp al, 'A'
+jne not_amd
+
+;Load the second character of the string into the AL register
+mov al, byte [cpu_name + 1]
+
+;Compare the second character with 'M'
+cmp al, 'M'
+jne not_amd
+
+;Load the third character of the string into the AL register
+mov al, byte [cpu_name + 2]
+
+; Compare the third character with 'D'
+cmp al, 'D'
+jne not_amd
+
+;Print the not_amd prompt
+push qword 0
+mov rax, 0
+mov rdi, amd_cpu
+call printf
+pop rax
+
+;Block to get clock speed input
+push qword 0                ;Push 0 onto the stack
+mov rax, 0                  ;Set the system call number to 0
+mov rdi, float_form         ;Set the first argument to the address of float_form
+mov rsi, rsp                ;Set the second argument to the address of the rsp
+call scanf                  ;Call the scanf function
+movsd xmm13, [rsp]          ;Store the input into xmm12
+pop rax                     ;Pop the 0 off the stack
+
+jmp intel_finish
+
+not_amd:
+
 push qword 0
 mov rax, 0
 call getfreq
 movsd xmm13, xmm0
 pop rax
+
+intel_finish:
 
 push qword 0
 mov rax, 1
@@ -274,6 +318,23 @@ push qword 0
 mov rax, 0
 mov rdi, elapsed_time
 mov rsi, r13
+call printf
+pop rax
+
+;Calculate how many tics per square root computation
+push qword 0 
+mov rax, 0
+cvtsi2sd xmm0, r13          ;Store tic count in xmm0
+cvtsi2sd xmm1, r15          ;Store amount of iterations in xmm1
+divsd xmm0, xmm1
+movsd xmm14, xmm0
+pop rax
+
+;Print "The time for one square root computation is..."
+push qword 0
+mov rax, 1
+mov rdi, time_for_one_sqrt
+movsd xmm0, xmm14
 call printf
 pop rax
 
