@@ -60,7 +60,7 @@ welcome db "Welcome to Square Root Benchmarks by Jared Pope", 10, 10, 0
 contact db "For customer service contact me at imthepope@csu.fullerton.edu", 10, 10, 0
 cpu_type db "Your CPU is %s", 10, 10, 0
 amd_cpu db "I cannot read the max clock speed of AMD CPUs. Please enter your CPUs max clock speed: ", 0
-max_clock_speed db 10, "Your max clock speed is %d GHz", 10, 10, 0
+max_clock_speed db 10, "Your max clock speed is %d MHz", 10, 10, 0
 square_root db 10, "The square root of %lf is %lf", 10, 10, 0
 iterations db "Next enter the number of times iteration should be performed: ", 0
 time db 10, "The time on the clock is %llu tics.", 10, 10, 0
@@ -149,10 +149,7 @@ mov rsi, cpu_name
 call printf
 pop rax
 
-;Block to get max clock speed
-;mov rax, 0x0000000000000016
-;cpuid
-;mov rdx, rbx
+
 
 ;Load the first character of the string into the AL register
 mov al, byte [cpu_name]
@@ -195,18 +192,24 @@ jmp intel_finish
 
 not_amd:
 
-push qword 0
-mov rax, 0
-call getfreq
-mov r12, rax
-pop rax
+;push qword 0
+;mov rax, 0
+;call getfreq
+;mov r12, rax
+;pop rax
+
+;Block to get max clock speed
+mov rax, 0x0000000000000016
+cpuid
+mov rdx, rbx
 
 intel_finish:
 
 push qword 0
-mov rax, 1
+mov rax, 0
 mov rdi, max_clock_speed
-movsd xmm0, xmm13
+mov rsi, rdx
+;movsd xmm0, xmm13
 call printf
 pop rax
 
@@ -336,8 +339,10 @@ pop rax
 ;Calculate nanoseconds
 push qword 0
 
-mov rax, r13                ; Move the number of tics into rax
-cvtsi2sd xmm0, rax          ; Convert the tics from integer to double and store in xmm0
+;mov rax, r13                ; Move the number of tics into rax
+;cvtsi2sd xmm0, rax          ; Convert the tics from integer to double and store in xmm0
+
+movsd xmm0, xmm14           ;Store number of tics per iteration in xmm0
 
 mov rax, r12                 ; Move the clock speed in MHz into rax
 cvtsi2sd xmm1, rax          ; Convert clock speed to float
@@ -345,13 +350,11 @@ cvtsi2sd xmm1, rax          ; Convert clock speed to float
 mov rax, [ten_power6]       ; Load 1,000,000 (10^6) into rax
 cvtsi2sd xmm2, rax          ; Convert 1,000,000 from integer to double and store in xmm2
 
-mulsd xmm1, xmm2
-divsd xmm0, xmm1
+mulsd xmm1, xmm2            ; Multiply MHz by 1 000 000 to get to Hz
+divsd xmm0, xmm1            ; Divide (tics per iteration) / Hz
 
-mov rax, [ten_power9]
+mov rax, [ten_power9]       ; Load 1 000 000 000
 cvtsi2sd xmm3, rax
-
-mulsd xmm0, xmm3
 
 movsd xmm15, xmm0
 
