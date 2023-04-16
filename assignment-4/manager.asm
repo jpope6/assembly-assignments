@@ -309,21 +309,24 @@ pop rax
 ;Subtract the start tics and end tics to get the elapsed tics
 push qword 0
 mov rax, 0
-sub r13, r14
+cvtsi2sd xmm0, r13
+cvtsi2sd xmm1, r14
+subsd xmm0, xmm1
+movsd xmm15, xmm0
 pop rax
 
 ;Print tics
 push qword 0
-mov rax, 0
+mov rax, 1
 mov rdi, elapsed_time
-mov rsi, r13
+movsd xmm0, xmm15
 call printf
 pop rax
 
 ;Calculate how many tics per square root computation
 push qword 0 
 mov rax, 0
-cvtsi2sd xmm0, r13          ;Store tic count in xmm0
+movsd xmm0, xmm15
 cvtsi2sd xmm1, r15          ;Store amount of iterations in xmm1
 divsd xmm0, xmm1
 movsd xmm14, xmm0
