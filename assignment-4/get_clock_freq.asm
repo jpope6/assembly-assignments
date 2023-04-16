@@ -30,14 +30,14 @@
 
 ;Declaration area
 global getfreq
-
-extern atoi
+extern cpuid
+extern scanf
 
 segment .data
-   ;Empty
+int_form db "%d", 0
 
 segment .bss
-   ;Empty
+;Empty
 
 segment .text
 getfreq:
@@ -60,33 +60,34 @@ push r14
 push r15
 pushf
 
+push qword 0
 
-;Extract data from processor in the form of two 4-byte strings
-mov rax, 0x0000000080000004
+mov r15, rdi                ;AMD vs Intel Variable
+
+cmp r15, 0                  ;If variable is 0, then cpu is Intel
+je intel
+
+
+;Block to get clock speed input
+push qword 0                ;Push 0 onto the stack
+mov rax, 0                  ;Set the system call number to 0
+mov rdi, int_form           ;Set the first argument to the address of float_form
+mov rsi, rsp                ;Set the second argument to the address of the rsp
+call scanf                  ;Call the scanf function
+mov r12, [rsp]              ;Store the input into xmm12
+pop rax                     ;Pop the 0 off the stack
+
+jmp finish
+
+intel:
+;Block to get max clock speed
+mov rax, 0x0000000000000016
 cpuid
-;Answer is in ebx:eax as big endian strings using the standard ordering of bits.
-mov       r15, rbx      ;Second part of string saved in r15
-mov       r14, rax      ;First part of string saved in r14
+mov r12, rbx
 
-
-;Catenate the two short strings into one 8-byte string in big endian
-and r15, 0x00000000000000FF    ;Convert non-numeric chars to nulls
-shl r15, 32
-or r15, r14                    ;Combined string is in r15
-
-;Use of mask: The number 0x00000000000000FF is a mask.  
-;In general masks are used to change some bits to 0 (or 1) and leave others unchanged.
-
-
-;Convert string now stored in r15 to an equivalent IEEE numeric quadword.
-push r15
-mov rax,0          ;The value in rax is the number of xmm registers passed to atof, 
-mov rdi,rsp        ;rdi now points to the start of the 8-byte string.
-call atoi          ;The number is now in rax
-mov r15, rax
+finish:
 pop rax
-
-mov rax, r15
+mov rax, r12                ;Return the max clock speed
 
 ;Epilogue: restore data to the values held before this function was called.
 popf

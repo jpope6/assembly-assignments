@@ -173,31 +173,24 @@ mov rdi, amd_cpu
 call printf
 pop rax
 
-;Block to get clock speed input
-push qword 0                ;Push 0 onto the stack
-mov rax, 0                  ;Set the system call number to 0
-mov rdi, int_form           ;Set the first argument to the address of float_form
-mov rsi, rsp                ;Set the second argument to the address of the rsp
-call scanf                  ;Call the scanf function
-mov r12, [rsp]              ;Store the input into xmm12
-pop rax                     ;Pop the 0 off the stack
+;Set the AMD variable to be true
+mov r10, 1                  ;1 = cpu is AMD
 
 jmp intel_finish
 
 not_amd:
 
-;push qword 0
-;mov rax, 0
-;call getfreq
-;mov r12, rax
-;pop rax
-
-;Block to get max clock speed
-mov rax, 0x0000000000000016
-cpuid
-mov r12, rbx
+mov r10, 0                  ;0 = intel
 
 intel_finish:
+
+;Block to call the getfreq function
+push qword 0
+mov rax, 0
+mov rdi, r10                ;Set the first parameter to our AMD/Intel variable
+call getfreq
+mov r12, rax
+pop rax
 
 push qword 0
 mov rax, 0
