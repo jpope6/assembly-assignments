@@ -60,18 +60,21 @@ welcome db "Welcome to Square Root Benchmarks by Jared Pope", 10, 10, 0
 contact db "For customer service contact me at imthepope@csu.fullerton.edu", 10, 10, 0
 cpu_type db "Your CPU is %s", 10, 10, 0
 amd_cpu db "I cannot read the max clock speed of AMD CPUs. Please enter your CPUs max clock speed: ", 0
-max_clock_speed db 10, "Your max clock speed is %.3f GHz", 10, 10, 0
+max_clock_speed db 10, "Your max clock speed is %d GHz", 10, 10, 0
 square_root db 10, "The square root of %lf is %lf", 10, 10, 0
 iterations db "Next enter the number of times iteration should be performed: ", 0
 time db 10, "The time on the clock is %llu tics.", 10, 10, 0
 in_progress db "The bench mark of the sqrtsd instruction is in progress.", 10, 10, 0
 complete db "The time on the clock is %llu tics and the benchmark is completed.", 10, 10, 0
 elapsed_time db "The elapsed time was %d tics", 10, 10, 0
-time_for_one_sqrt db "The time for one square root computation is %lf tics which equals 0.00000 ns.", 10, 10, 0
+time_for_one_sqrt db "The time for one square root computation is %lf tics which equals %lf ns.", 10, 10, 0
 
 float_form db "%lf", 0
 int_form db "%d", 0
 
+ten_power3 dd 1000
+ten_power6 dd 1000000
+ten_power9 dd 1000000000
 
 segment .text
 manager:
@@ -182,10 +185,10 @@ pop rax
 ;Block to get clock speed input
 push qword 0                ;Push 0 onto the stack
 mov rax, 0                  ;Set the system call number to 0
-mov rdi, float_form         ;Set the first argument to the address of float_form
+mov rdi, int_form           ;Set the first argument to the address of float_form
 mov rsi, rsp                ;Set the second argument to the address of the rsp
 call scanf                  ;Call the scanf function
-movsd xmm13, [rsp]          ;Store the input into xmm12
+mov r12, [rsp]              ;Store the input into xmm12
 pop rax                     ;Pop the 0 off the stack
 
 jmp intel_finish
@@ -195,7 +198,7 @@ not_amd:
 push qword 0
 mov rax, 0
 call getfreq
-movsd xmm13, xmm0
+mov r12, rax
 pop rax
 
 intel_finish:
@@ -330,11 +333,36 @@ divsd xmm0, xmm1
 movsd xmm14, xmm0
 pop rax
 
+;Calculate nanoseconds
+push qword 0
+
+mov rax, r13                ; Move the number of tics into rax
+cvtsi2sd xmm0, rax          ; Convert the tics from integer to double and store in xmm0
+
+mov rax, r12                 ; Move the clock speed in MHz into rax
+cvtsi2sd xmm1, rax          ; Convert clock speed to float
+
+mov rax, [ten_power6]       ; Load 1,000,000 (10^6) into rax
+cvtsi2sd xmm2, rax          ; Convert 1,000,000 from integer to double and store in xmm2
+
+mulsd xmm1, xmm2
+divsd xmm0, xmm1
+
+mov rax, [ten_power9]
+cvtsi2sd xmm3, rax
+
+mulsd xmm0, xmm3
+
+movsd xmm15, xmm0
+
+pop rax
+
 ;Print "The time for one square root computation is..."
 push qword 0
-mov rax, 1
+mov rax, 2
 mov rdi, time_for_one_sqrt
 movsd xmm0, xmm14
+movsd xmm1, xmm15
 call printf
 pop rax
 

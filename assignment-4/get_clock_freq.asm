@@ -31,7 +31,7 @@
 ;Declaration area
 global getfreq
 
-extern atof
+extern atoi
 
 segment .data
    ;Empty
@@ -82,9 +82,11 @@ or r15, r14                    ;Combined string is in r15
 push r15
 mov rax,0          ;The value in rax is the number of xmm registers passed to atof, 
 mov rdi,rsp        ;rdi now points to the start of the 8-byte string.
-call atof          ;The number is now in xmm0
+call atoi          ;The number is now in rax
+mov r15, rax
 pop rax
 
+mov rax, r15
 
 ;Epilogue: restore data to the values held before this function was called.
 popf
