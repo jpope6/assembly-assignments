@@ -67,14 +67,10 @@ time db 10, "The time on the clock is %llu tics.", 10, 10, 0
 in_progress db "The bench mark of the sqrtsd instruction is in progress.", 10, 10, 0
 complete db "The time on the clock is %llu tics and the benchmark is completed.", 10, 10, 0
 elapsed_time db "The elapsed time was %d tics", 10, 10, 0
-time_for_one_sqrt db "The time for one square root computation is %lf tics which equals %lf ns.", 10, 10, 0
+time_for_one_sqrt db "The time for one square root computation is %f tics which equals %lf ns.", 10, 10, 0
 
 float_form db "%lf", 0
 int_form db "%d", 0
-
-ten_power3 dd 1000
-ten_power6 dd 1000000
-ten_power9 dd 1000000000
 
 segment .text
 manager:
@@ -149,8 +145,6 @@ mov rsi, cpu_name
 call printf
 pop rax
 
-
-
 ;Load the first character of the string into the AL register
 mov al, byte [cpu_name]
 
@@ -201,15 +195,14 @@ not_amd:
 ;Block to get max clock speed
 mov rax, 0x0000000000000016
 cpuid
-mov rdx, rbx
+mov r12, rbx
 
 intel_finish:
 
 push qword 0
 mov rax, 0
 mov rdi, max_clock_speed
-mov rsi, rdx
-;movsd xmm0, xmm13
+mov rsi, r12
 call printf
 pop rax
 
@@ -339,22 +332,23 @@ pop rax
 ;Calculate nanoseconds
 push qword 0
 
-;mov rax, r13                ; Move the number of tics into rax
-;cvtsi2sd xmm0, rax          ; Convert the tics from integer to double and store in xmm0
-
-movsd xmm0, xmm14           ;Store number of tics per iteration in xmm0
+movsd xmm0, xmm14           ;Store number of tics per iteration in xmm0   35.844349
 
 mov rax, r12                 ; Move the clock speed in MHz into rax
 cvtsi2sd xmm1, rax          ; Convert clock speed to float
 
-mov rax, [ten_power6]       ; Load 1,000,000 (10^6) into rax
+
+mov rax, 0xF4240            ; Load 1,000,000 (10^6) into rax
 cvtsi2sd xmm2, rax          ; Convert 1,000,000 from integer to double and store in xmm2
 
-mulsd xmm1, xmm2            ; Multiply MHz by 1 000 000 to get to Hz
-divsd xmm0, xmm1            ; Divide (tics per iteration) / Hz
+mulsd xmm1, xmm2            ; Multiply MHz by 1 000 000 to get to Hz   4600000
 
-mov rax, [ten_power9]       ; Load 1 000 000 000
+divsd xmm0, xmm1            ; Divide (tics per iteration) / Hz   35.844349 / 4600000 = 
+
+mov rax, 0x3B9ACA00       ; Load 1 000 000 000
 cvtsi2sd xmm3, rax
+
+mulsd xmm0, xmm3
 
 movsd xmm15, xmm0
 
