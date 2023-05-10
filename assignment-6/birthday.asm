@@ -258,36 +258,36 @@ mov r11, rdx                ;Store the TSC value in r11
 pop rax                     ;Pop the 0 off the stack
 
 ;Print "The time on the clock is now"
-push qword 0            ;Push a 0 onto the stack
-mov rax, 0              ;Set the system call number to 0
-mov rdi, time           ;Set the message for printf
-call printf             ;Call printf to print the message
-pop rax                 ;Pop the 0 off the stack
+push qword 0                ;Push a 0 onto the stack
+mov rax, 0                  ;Set the system call number to 0
+mov rdi, time               ;Set the message for printf
+call printf                 ;Call printf to print the message
+pop rax                     ;Pop the 0 off the stack
 
 ;Subtract the start tics and end tics to get the elapsed tics
-push qword 0            ;Push a 0 onto the stack
-mov rax, 0              ;Set the system call number to 0
-cvtsi2sd xmm0, r12      ;Convert the end TSC value to a double and store in xmm0
-cvtsi2sd xmm1, r11      ;Convert the start TSC value to a double and store in xmm1
-subsd xmm0, xmm1        ;Subtract the start TSC value from the end TSC value
-movsd xmm15, xmm0       ;Store the elapsed TSC value in xmm15
-pop rax                 ;Pop the 0 off the stack
+push qword 0                ;Push a 0 onto the stack
+mov rax, 0                  ;Set the system call number to 0
+cvtsi2sd xmm0, r12          ;Convert the end TSC value to a double and store in xmm0
+cvtsi2sd xmm1, r11          ;Convert the start TSC value to a double and store in xmm1
+subsd xmm0, xmm1            ;Subtract the start TSC value from the end TSC value
+movsd xmm15, xmm0           ;Store the elapsed TSC value in xmm15
+pop rax                     ;Pop the 0 off the stack
 
 ;Print elapsed tics
-push qword 0            ;Push a 0 onto the stack
-mov rax, 1              ;Set the number of floating-point parameters for printf
-mov rdi, elapsed_time   ;Set the format string for printf
-movsd xmm0, xmm15       ;Move the elapsed TSC value to xmm0
-call printf             ;Call printf to print the message
+push qword 0                ;Push a 0 onto the stack
+mov rax, 1                  ;Set the number of floating-point parameters for printf
+mov rdi, elapsed_time       ;Set the format string for printf
+movsd xmm0, xmm15           ;Move the elapsed TSC value to xmm0
+call printf                 ;Call printf to print the message
 movsd xmm15, xmm0
-pop rax                 ;Pop the 0 off the stack
+pop rax                     ;Pop the 0 off the stack
 
 ;Print "The elapsed time will be returned to the caller."
-push qword 0            ;Push a 0 onto the stack
-mov rax, 0              ;Set the system call number to 0
-mov rdi, time           ;Set the message for printf
-call printf             ;Call printf to print the message
-pop rax                 ;Pop the 0 off the stack
+push qword 0                ;Push a 0 onto the stack
+mov rax, 0                  ;Set the system call number to 0
+mov rdi, time               ;Set the message for printf
+call printf                 ;Call printf to print the message
+pop rax                     ;Pop the 0 off the stack
 
 pop rax
 movsd xmm0, xmm15       ;Return the amount of elapsed tics to main
